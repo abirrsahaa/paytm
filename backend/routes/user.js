@@ -7,6 +7,7 @@ const router = express.Router();
 router.use(express.json());
 import User from "../models/user.js";
 import authfunction from "../middleware/auth.js";
+import { Account } from "../models/user.js";
 
 // need to make routes for the user
 // the first route is to sign up the user
@@ -56,6 +57,12 @@ router.post("/signup", async (req, res) => {
     firstname,
     lastname,
     email,
+  });
+
+  // now that the user has been created lets also initialize the account for the user
+  const account = await Account.create({
+    user_id: user._id,
+    balance: 1 + Math.floor(Math.random() * 1000),
   });
   // if not present then we need to hash the password  then create a entry in the database
   // then create a jwt token with the id of the user
@@ -172,7 +179,18 @@ router.get("/bulk", authfunction, async (req, res) => {
     return res.status(411).json({ message: "no name provided provided" });
   }
   const user = await User.find({
-    $or: [{ firstname: filter }, { lastname: filter }],
+    $or: [
+      {
+        firstName: {
+          "$regex": filter,
+        },
+      },
+      {
+        lastName: {
+          "$regex": filter,
+        },
+      },
+    ],
   });
   console.log("user-> ", user);
   if (user.length <= 0) {
