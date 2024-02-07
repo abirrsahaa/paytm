@@ -62,7 +62,7 @@ router.post("/signup", async (req, res) => {
   // now that the user has been created lets also initialize the account for the user
   const account = await Account.create({
     user_id: user._id,
-    balance: 1 + Math.floor(Math.random() * 1000),
+    balance: 1 + Math.floor(Math.random() * 10000),
   });
   // if not present then we need to hash the password  then create a entry in the database
   // then create a jwt token with the id of the user
@@ -70,7 +70,7 @@ router.post("/signup", async (req, res) => {
     {
       id: user._id,
     },
-    jwt_secret
+    jwt_secret,
   );
 
   const created_user = await User.findById(user._id).select("-hashed_password");
@@ -175,19 +175,20 @@ router.put("/", authfunction, async (req, res) => {
 router.get("/bulk", authfunction, async (req, res) => {
   // define the algorithm first
   const filter = req.query.filter;
+  console.log("filter -> ", filter);
   if (!filter) {
     return res.status(411).json({ message: "no name provided provided" });
   }
   const user = await User.find({
     $or: [
       {
-        firstName: {
-          "$regex": filter,
+        firstname: {
+          $regex: filter,
         },
       },
       {
-        lastName: {
-          "$regex": filter,
+        lastname: {
+          $regex: filter,
         },
       },
     ],

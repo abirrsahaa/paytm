@@ -1,7 +1,7 @@
 import express from "express";
 import { z } from "zod";
-import authfunction from "../middleware/auth";
-import { Account } from "../models/user";
+import authfunction from "../middleware/auth.js";
+import { Account } from "../models/user.js";
 import mongoose from "mongoose";
 const router = express.Router();
 router.use(express.json());
@@ -9,7 +9,7 @@ router.use(express.json());
 // an api end point for the user to get their balance
 router.get("/balance", authfunction, async (req, res) => {
   // get the userid from the req
-  const id = req.user_id;
+  const id = req.userId;
   if (!id) return res.status(411).json({ message: "user not found" });
   const account = await Account.findOne({ user_id: id });
   if (!account) return res.status(411).json({ message: "account not found" });
@@ -35,13 +35,14 @@ router.post("/transfer", authfunction, async (req, res) => {
     await session.abortTransaction();
     return res.status(411).json({ message: "Invalid input" });
   }
-  if (!req.user_id) {
+  console.log("parsed input of transfer -> ", parsedInput);
+  if (!req.userId) {
     await session.abortTransaction();
     return res.status(411).json({ message: "User not found" });
   }
   // getting the sender account details
-  const senderAccount = await Account.findOne({ user_id: req.user_id }).session(
-    session
+  const senderAccount = await Account.findOne({ user_id: req.userId }).session(
+    session,
   );
   if (!senderAccount || senderAccount.balance < parsedInput?.data?.amount) {
     await session.abortTransaction();
@@ -62,13 +63,13 @@ router.post("/transfer", authfunction, async (req, res) => {
   // first update the sender account
   await Account.updateOne(
     {
-      user_id: req.user_id,
+      user_id: req?.userId,
     },
     {
       $inc: {
         balance: -parsedInput?.data?.amount,
       },
-    }
+    },
   ).session(session);
 
   await Account.updateOne(
@@ -79,7 +80,7 @@ router.post("/transfer", authfunction, async (req, res) => {
       $inc: {
         balance: parsedInput?.data?.amount,
       },
-    }
+    },
   ).session(session);
 
   //now commiting the transaction
