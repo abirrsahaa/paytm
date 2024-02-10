@@ -208,4 +208,8 @@ router.get("/bulk", authfunction, async (req, res) => {
   });
 });
 
+// but only thing is that i need to know is so many db calls making is a good option or not !!?
+
+// i need to get a route to get details of individual user
+// and all the details of all  the user
 export default router;
