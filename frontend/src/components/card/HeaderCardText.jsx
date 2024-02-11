@@ -1,10 +1,10 @@
 import React from "react";
 
-const HeaderCardText = () => {
+const HeaderCardText = ({ text }) => {
   return (
     <div className="  mt-2">
       <p className="flex justify-center items-center tracking-normal text-lg   text-center  m-1 pt-1 w-[19vw]">
-        Enter your information to create an account
+        {text}
       </p>
     </div>
   );
