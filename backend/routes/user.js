@@ -14,10 +14,13 @@ import { Account } from "../models/user.js";
 
 // created the signup router
 
+router.use(express.json());
+
 router.post("/signup", async (req, res) => {
   // write the algorithm that you want ..
   // first use zod for validation
   //   console.log("the request ->", req);
+
   console.log("body data -> ", req.body);
   const signupInput = z.object({
     username: z.string().min(4).max(20),
@@ -44,9 +47,10 @@ router.post("/signup", async (req, res) => {
   });
   // if present then we need to send a error
   if (existing) {
-    return res
-      .status(411)
-      .json({ message: "Email already taken / Incorrect inputs" });
+    return res.status(411).json({
+      success: false,
+      message: "Email already taken / Incorrect inputs",
+    });
   }
 
   const hashed = await bcrypt.hash(password, 10);
@@ -76,6 +80,7 @@ router.post("/signup", async (req, res) => {
   const created_user = await User.findById(user._id).select("-hashed_password");
 
   return res.status(200).json({
+    success: true,
     message: "User created successfully",
     token: token,
     created_user: created_user,

@@ -2,6 +2,9 @@ import React from "react";
 import Input from "../card/Input";
 
 const UserSearch = () => {
+  // here i need to hit an api whre i will be getting the name of all the user in the database
+  // for that i need to create such an api for that first !
+
   return (
     <>
       <div className="p-4 m-2 mt-3 ">
