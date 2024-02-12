@@ -77,9 +77,14 @@ router.post("/signup", async (req, res) => {
     jwt_secret,
   );
 
+  const options = {
+    expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+  };
+
   const created_user = await User.findById(user._id).select("-hashed_password");
 
-  return res.status(200).json({
+  return res.cookie("token", token, options).status(200).json({
     success: true,
     message: "User created successfully",
     token: token,
@@ -118,7 +123,13 @@ router.post("/signin", async (req, res) => {
 
   const token = jwt.sign({ id: user._id }, jwt_secret);
   const user_details = await User.findById(user._id).select("-hashed_password");
+
+  const options = {
+    expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+  };
   return res
+    .cookie("token", token, options)
     .status(200)
     .json({ message: "user logged in successfully", token, user_details });
 });
@@ -215,6 +226,25 @@ router.get("/bulk", authfunction, async (req, res) => {
 
 // but only thing is that i need to know is so many db calls making is a good option or not !!?
 
-// i need to get a route to get details of individual user
 // and all the details of all  the user
+// route to get the name of all the user to show in the database
+
+// !note:need to provide middleware for authentication
+router.get("/getting", async (req, res) => {
+  try {
+    // const id = req.userId;
+    // if (!id) {
+    //   return res.status(411).json({ message: "the user is not authorized!!" });
+    // }
+    // if the author is authorized now he has the credibility to look through the db
+    let users = await User.find({}).select("firstname");
+    // console.log(users);
+    if (users.length == 0)
+      return res.status(411).json({ message: "there are no users in your db" });
+    return res.status(200).json({ users });
+  } catch (error) {
+    console.log(error);
+    return res.status(411).json(error);
+  }
+});
 export default router;

@@ -6,6 +6,8 @@ import Button from "./Button";
 import CardWarnText from "./CardWarnText";
 import FriendProfile from "./FriendProfile";
 import { Navigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setting } from "../../store/tokenSlice";
 
 const Card = ({
   header = "",
@@ -34,11 +36,14 @@ const Card = ({
   // will be using three button handlers as everything will be handled on clicking on the button !
   // now that i have track of every input its my turn to send them to the backend
   // i will be using fetch api to send the data to the backend
-
+  const dispatch = useDispatch();
   // handling the urls
   const signupRoute = "http://localhost:3000/api/v1/user/signup";
   const signinRoute = "http://localhost:3000/api/v1/user/signin";
   const transferRoute = "http://localhost:3000/api/v1/account/transfer";
+
+  // getting the token from my store
+  // i dont think i need it !
 
   // creating the function for signin
   const signinHandler = async () => {};
@@ -67,6 +72,8 @@ const Card = ({
     if (response.success) {
       alert("User created successfully");
       setUser(true);
+      console.log(response.token);
+      dispatch(setting(response.token));
     } else {
       alert("User creation failed");
     }
