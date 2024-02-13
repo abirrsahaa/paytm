@@ -105,20 +105,23 @@ router.post("/signin", async (req, res) => {
   if (!parsedInput.success) {
     return res
       .status(411)
-      .json({ message: "the credentials provided are not matching criteria " });
+      .json({
+        success: false,
+        message: "the credentials provided are not matching criteria ",
+      });
   }
   const { username, password } = parsedInput.data;
   const user = await User.findOne({ username });
   if (!user) {
     return res
       .status(411)
-      .json({ message: "no user with such username exists" });
+      .json({ success: false, message: "no user with such username exists" });
   }
   const pass_check = await bcrypt.compare(password, user.hashed_password);
   if (!pass_check) {
     return res
       .status(411)
-      .json({ message: "the password provided is incorrect" });
+      .json({ success: false, message: "the password provided is incorrect" });
   }
 
   const token = jwt.sign({ id: user._id }, jwt_secret);
@@ -128,10 +131,12 @@ router.post("/signin", async (req, res) => {
     expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
     httpOnly: true,
   };
-  return res
-    .cookie("token", token, options)
-    .status(200)
-    .json({ message: "user logged in successfully", token, user_details });
+  return res.cookie("token", token, options).status(200).json({
+    success: true,
+    message: "user logged in successfully",
+    token,
+    user_details,
+  });
 });
 
 // created the update router for the user

@@ -1,8 +1,16 @@
 import React, { useEffect, useState } from "react";
 import Input from "../card/Input";
+import { useDispatch } from "react-redux";
+import { naming } from "../../store/FriendSlice";
+import { idding } from "../../store/FriendSlice";
+import { Navigate } from "react-router-dom";
 
 const UserSearch = () => {
   const [users, setUsers] = useState([]);
+  const dispatch = useDispatch();
+  const [redirect, setRedirect] = useState(false);
+
+  const [naam, setnaam] = useState("");
 
   // i will run this only once
   useEffect(() => {
@@ -11,10 +19,20 @@ const UserSearch = () => {
       const flattening = await response.json();
       console.log("the response after flattening is --> ", flattening);
       setUsers(flattening.users);
+      setRedirect(false);
     };
 
     fetching();
   }, []);
+
+  const sendingMoney = async (name, id) => {
+    if (name) setnaam(name);
+    // i have set the name
+    // its time to udate the friend name in the store
+    dispatch(naming(name));
+    dispatch(idding(id));
+    setRedirect(true);
+  };
 
   return (
     <>
@@ -39,9 +57,13 @@ const UserSearch = () => {
                     {user.firstname}
                   </span>
                 </div>
-                <button className="w-[8vw] h-[3vw] p-1 flex justify-center items-center tracking-tighter font-semibold border-black border-2 border-solid rounded-lg bg-black text-white">
+                <button
+                  onClick={() => sendingMoney(user.firstname, user._id)}
+                  className="w-[8vw] h-[3vw] p-1 flex justify-center items-center tracking-tighter font-semibold border-black border-2 border-solid rounded-lg bg-black text-white"
+                >
                   Send Money
                 </button>
+                {redirect && <Navigate to="/transfer" replace={true} />}
               </div>
             </>
           ))}

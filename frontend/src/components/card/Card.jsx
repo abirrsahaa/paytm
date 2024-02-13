@@ -31,7 +31,7 @@ const Card = ({
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(0);
   const [user, setUser] = useState(false);
   // will be using three button handlers as everything will be handled on clicking on the button !
   // now that i have track of every input its my turn to send them to the backend
@@ -46,7 +46,29 @@ const Card = ({
   // i dont think i need it !
 
   // creating the function for signin
-  const signinHandler = async () => {};
+  const signinHandler = async () => {
+    const signingIn = await fetch(signinRoute, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: username,
+        password: password,
+      }),
+    });
+
+    const response = await signingIn.json();
+
+    console.log(" the response from the signin is --> ", response);
+    if (response.success) {
+      alert("User signed in successfully");
+      setUser(true);
+      dispatch(setting(response.token));
+    } else {
+      alert("User sign in failed");
+    }
+  };
 
   // creating the function for signup
 
@@ -80,8 +102,40 @@ const Card = ({
   };
 
   // creating the function for send money
+  // const name = useSelector((store) => store.friend.dost);
+  const to = useSelector((store) => store.friend.id);
+  const token = useSelector((store) => store.token.token);
 
-  const transferHandler = async () => {};
+  const transferHandler = async () => {
+    // write the logic first
+    // you need to pass the body with the name and amount
+    // name i will be getting from the redux store
+    // amount i will be getting from the state variable
+    // and then i will be getting the reponse from an api call
+    // which i will be making by setting my token from again the store
+    const converted = parseInt(amount);
+    console.log("the type of amount is --> ", typeof converted);
+    const reponseTransfer = await fetch(transferRoute, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        to: to,
+        amount: converted,
+      }),
+    });
+
+    const response = await reponseTransfer.json();
+    console.log("the response from the transfer is --> ", response);
+    if (response.success) {
+      alert("Transfer successful");
+      setUser(true);
+    } else {
+      alert("Transfer failed");
+    }
+  };
 
   return (
     <div className="w-[25vw] flex flex-col justify-center items-center p-2 bg-slate-50 relative   rounded-lg">
@@ -146,7 +200,11 @@ const Card = ({
           />
         )}
         {header == "Sign In" && (
-          <Button classname={"bg-black"} text="Sign In" />
+          <Button
+            classname={"bg-black"}
+            text="Sign In"
+            getting={signinHandler}
+          />
         )}
         {header == "Sign Up" && (
           <Button
@@ -156,7 +214,11 @@ const Card = ({
           />
         )}
         {header == "Send Money" && (
-          <Button classname={"bg-green-500"} text="Initiate Transfer" />
+          <Button
+            classname={"bg-green-500"}
+            text="Initiate Transfer"
+            getting={transferHandler}
+          />
         )}
         {(header == "Sign In" || header == "Sign Up") && (
           <CardWarnText text={cardWarn} linking={linking} />

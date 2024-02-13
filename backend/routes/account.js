@@ -37,15 +37,19 @@ router.post("/transfer", authfunction, async (req, res) => {
     to: z.string().max(24),
     amount: z.number().min(1),
   });
+  console.log(req.body);
+  console.log(typeof req.body.to, typeof req.body.amount);
+  // const to = req.body.to;
+  // const amount = Number(req.body.amount);
   const parsedInput = transferInput.safeParse(req.body);
   if (!parsedInput.success) {
     await session.abortTransaction();
-    return res.status(411).json({ message: "Invalid input" });
+    return res.status(411).json({ success: false, message: "Invalid input" });
   }
   console.log("parsed input of transfer -> ", parsedInput);
   if (!req.userId) {
     await session.abortTransaction();
-    return res.status(411).json({ message: "User not found" });
+    return res.status(411).json({ success: false, message: "User not found" });
   }
   // getting the sender account details
   const senderAccount = await Account.findOne({ user_id: req.userId }).session(
@@ -53,7 +57,9 @@ router.post("/transfer", authfunction, async (req, res) => {
   );
   if (!senderAccount || senderAccount.balance < parsedInput?.data?.amount) {
     await session.abortTransaction();
-    return res.status(411).json({ message: "Account not found" });
+    return res
+      .status(411)
+      .json({ success: false, message: "Account not found" });
   }
 
   // now getting the receiver account details
@@ -63,7 +69,9 @@ router.post("/transfer", authfunction, async (req, res) => {
 
   if (!receiverAccount) {
     await session.abortTransaction();
-    return res.status(411).json({ message: "Receiver not found" });
+    return res
+      .status(411)
+      .json({ success: false, message: "Receiver not found" });
   }
 
   // now handle the transactions finally
@@ -93,7 +101,9 @@ router.post("/transfer", authfunction, async (req, res) => {
   //now commiting the transaction
   await session.commitTransaction();
 
-  return res.status(200).json({ message: "Transaction successful" });
+  return res
+    .status(200)
+    .json({ success: true, message: "Transaction successful" });
 });
 
 export default router;

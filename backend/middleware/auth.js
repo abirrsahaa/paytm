@@ -6,10 +6,9 @@ const authfunction = async (req, res, next) => {
   // !doubt--? do i need zod validation for checking the token from header (#my view is no as it is not provided by the user)
   // !the problem statement says that i need to look for the token in the header
   console.log(req.headers);
-  console.log(req.cookie.split("=")[1]);
+  console.log(req.cookies);
   // so taking the value from header
-  const token =
-    req?.headers?.authorization.split(" ")[1] || req.cookie.split("=")[1];
+  const token = req?.headers?.authorization.split(" ")[1] || req.cookies.token;
   if (!token) {
     return res.status(411).json({ message: "no token provided in the header" });
   }

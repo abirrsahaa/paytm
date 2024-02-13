@@ -80,7 +80,7 @@ const Input = ({
           placeholder={placeholder}
         />
       )}
-      {label === "Send Money" && (
+      {label === "Amount (in Rs) " && (
         <input
           type={type}
           value={value}
