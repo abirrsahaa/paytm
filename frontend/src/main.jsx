@@ -14,7 +14,7 @@ import store from "./store/store.js";
 // need to build the home page for my app !
 
 const router = createBrowserRouter([
-  { path: "/signup", element: <SignUp /> },
+  { path: "/", element: <SignUp /> },
   { path: "/signin", element: <Signin /> },
   { path: "/dashboard", element: <DashboardPage /> },
   { path: "/transfer", element: <MoneyTransfer /> },

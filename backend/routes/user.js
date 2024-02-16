@@ -103,12 +103,10 @@ router.post("/signin", async (req, res) => {
   });
   let parsedInput = signinInput.safeParse(req.body);
   if (!parsedInput.success) {
-    return res
-      .status(411)
-      .json({
-        success: false,
-        message: "the credentials provided are not matching criteria ",
-      });
+    return res.status(411).json({
+      success: false,
+      message: "the credentials provided are not matching criteria ",
+    });
   }
   const { username, password } = parsedInput.data;
   const user = await User.findOne({ username });
@@ -195,10 +193,13 @@ router.put("/", authfunction, async (req, res) => {
 // and my answer for this is yes damn yes !!
 router.get("/bulk", authfunction, async (req, res) => {
   // define the algorithm first
+  // here the route will be /bulk?filter=firstname
   const filter = req.query.filter;
   console.log("filter -> ", filter);
   if (!filter) {
-    return res.status(411).json({ message: "no name provided provided" });
+    return res
+      .status(411)
+      .json({ success: false, message: "no name provided provided" });
   }
   const user = await User.find({
     $or: [
@@ -216,10 +217,13 @@ router.get("/bulk", authfunction, async (req, res) => {
   });
   console.log("user-> ", user);
   if (user.length <= 0) {
-    return res.status(411).json({ message: "no such user exists" });
+    return res
+      .status(411)
+      .json({ success: false, message: "no such user exists" });
   }
 
   return res.status(200).json({
+    success: true,
     user: user.map((user) => ({
       username: user.username,
       firstName: user.firstname,

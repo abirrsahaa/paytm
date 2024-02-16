@@ -113,7 +113,7 @@ const Card = ({
     // amount i will be getting from the state variable
     // and then i will be getting the reponse from an api call
     // which i will be making by setting my token from again the store
-    const converted = parseInt(amount);
+    const converted = Number(amount);
     console.log("the type of amount is --> ", typeof converted);
     const reponseTransfer = await fetch(transferRoute, {
       method: "POST",

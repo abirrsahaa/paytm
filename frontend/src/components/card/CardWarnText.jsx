@@ -5,7 +5,7 @@ const CardWarnText = ({ text = "", linking = "" }) => {
   return (
     <div className="w-full text-center">
       {text} {linking == "Login" && <Link to="/signin">{linking}</Link>}{" "}
-      {linking == "Sign Up" && <Link to="/signup">{linking}</Link>}
+      {linking == "Sign Up" && <Link to="/">{linking}</Link>}
     </div>
   );
 };

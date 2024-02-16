@@ -13,6 +13,7 @@ const Input = ({
   setPassword,
   setEmail,
   setAmount,
+  setSearchUser,
   ...props
 }) => {
   return (
@@ -87,6 +88,18 @@ const Input = ({
           onChange={(e) => {
             console.log(value);
             setAmount(e.target.value);
+          }}
+          className={`border-2 border-black border-solid w-[90%] p-1 pl-4 m-2 h-[2.9vw] rounded-lg`}
+          placeholder={placeholder}
+        />
+      )}
+      {label === "Users" && (
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => {
+            console.log(value);
+            setSearchUser(e.target.value);
           }}
           className={`border-2 border-black border-solid w-[90%] p-1 pl-4 m-2 h-[2.9vw] rounded-lg`}
           placeholder={placeholder}

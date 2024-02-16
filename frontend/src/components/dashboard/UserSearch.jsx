@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from "react";
 import Input from "../card/Input";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { naming } from "../../store/FriendSlice";
 import { idding } from "../../store/FriendSlice";
-import { Navigate } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 
 const UserSearch = () => {
   const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
   const [redirect, setRedirect] = useState(false);
+  const token = useSelector((state) => state.token.token);
 
   const [naam, setnaam] = useState("");
+
+  const [searchUser, setSearchUser] = useState("");
+
+  const searchingurl = "http://localhost:3000/api/v1/user/bulk?filter=";
 
   // i will run this only once
   useEffect(() => {
@@ -25,6 +30,30 @@ const UserSearch = () => {
     fetching();
   }, []);
 
+  useEffect(() => {
+    const fetchingi = async () => {
+      console.log(
+        `http://localhost:3000/api/v1/user/bulk?filter=${searchUser}`
+      );
+      const fetching = await fetch(
+        `http://localhost:3000/api/v1/user/bulk?filter=${searchUser}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+        }
+      );
+      const response = await fetching.json();
+      if (response.success) {
+        console.log("the response after searching is --> ", response);
+        setUsers(response.user);
+      }
+    };
+    fetchingi();
+  }, [searchUser, token]);
+
   const sendingMoney = async (name, id) => {
     if (name) setnaam(name);
     // i have set the name
@@ -36,12 +65,15 @@ const UserSearch = () => {
 
   return (
     <>
+      {/* implemented the search functionality now need to implement debouncing and throttling  */}
       <div className="p-4 m-2 mt-3 ">
         <Input
           label="Users"
           type="search"
           placeholder="Search User"
           labelclass={"text-2xl font-bold m-2 "}
+          value={searchUser}
+          setSearchUser={setSearchUser}
         />
       </div>
       <div className="w-[90%]  m-2 flex flex-col justify-center items-center">
@@ -54,11 +86,13 @@ const UserSearch = () => {
                     U1
                   </div>
                   <span className="text-3xl  font-bold tracking-tighter">
-                    {user.firstname}
+                    {user.firstname || user.firstName}
                   </span>
                 </div>
                 <button
-                  onClick={() => sendingMoney(user.firstname, user._id)}
+                  onClick={() =>
+                    sendingMoney(user.firstname || user.firstName, user._id)
+                  }
                   className="w-[8vw] h-[3vw] p-1 flex justify-center items-center tracking-tighter font-semibold border-black border-2 border-solid rounded-lg bg-black text-white"
                 >
                   Send Money
