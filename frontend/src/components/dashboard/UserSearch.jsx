@@ -20,39 +20,44 @@ const UserSearch = () => {
   // i will run this only once
   useEffect(() => {
     const fetching = async () => {
-      const response = await fetch("http://localhost:3000/api/v1/user/getting");
-      const flattening = await response.json();
-      console.log("the response after flattening is --> ", flattening);
-      setUsers(flattening.users);
-      setRedirect(false);
+      try {
+        const response = await fetch("http://localhost:3000/users");
+        const data = await response.json();
+        console.log("Fetched data:", data); // Debugging log
+  
+        // Ensure correct data assignment
+        setUsers(Array.isArray(data) ? data : data.users || []);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
     };
-
+  
     fetching();
   }, []);
 
-  useEffect(() => {
-    const fetchingi = async () => {
-      console.log(
-        `http://localhost:3000/api/v1/user/bulk?filter=${searchUser}`
-      );
-      const fetching = await fetch(
-        `http://localhost:3000/api/v1/user/bulk?filter=${searchUser}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-        }
-      );
-      const response = await fetching.json();
-      if (response.success) {
-        console.log("the response after searching is --> ", response);
-        setUsers(response.user);
-      }
-    };
-    fetchingi();
-  }, [searchUser, token]);
+  // useEffect(() => {
+  //   const fetchingi = async () => {
+  //     console.log(
+  //       `http://localhost:3000/api/v1/user/bulk?filter=${searchUser}`
+  //     );
+  //     const fetching = await fetch(
+  //       `http://localhost:3000/api/v1/user/bulk?filter=${searchUser}`,
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "Authorization": `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //     const response = await fetching.json();
+  //     if (response.success) {
+  //       console.log("the response after searching is --> ", response);
+  //       setUsers(response.user);
+  //     }
+  //   };
+  //   fetchingi();
+  // }, [searchUser, token]);
 
   const sendingMoney = async (name, id) => {
     if (name) setnaam(name);
@@ -66,7 +71,7 @@ const UserSearch = () => {
   return (
     <>
       {/* implemented the search functionality now need to implement debouncing and throttling  */}
-      <div className="p-4 m-2 mt-3 ">
+      {/* <div className="p-4 m-2 mt-3 ">
         <Input
           label="Users"
           type="search"
@@ -75,12 +80,13 @@ const UserSearch = () => {
           value={searchUser}
           setSearchUser={setSearchUser}
         />
-      </div>
+      </div> */}
       <div className="w-[90%]  m-2 flex flex-col justify-center items-center">
-        {users.length > 0 &&
-          users.map((user) => (
+        {console.log(users)}
+        {users?.length > 0 &&
+          users.map((user,index) => (
             <>
-              <div className="shadow-lg w-[97%] p-1  m-2 h-[4.2vw] rounded-lg flex justify-between items-between">
+              <div key={index} className="shadow-lg w-[97%] p-1  m-2 h-[4.2vw] rounded-lg flex justify-between items-between">
                 <div className="p-1 w-[12vw]  gap-2  flex  items-center justify-between">
                   <div className="bg-gray-200 h-[3vw] w-[3vw] rounded-full text-black flex justify-center items-center font-semibold text-xl">
                     U1

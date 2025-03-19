@@ -1,0 +1,58 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "username": "john_doe",
+      "password": "John",
+      "firstname": "John",
+      "lastname": "Doe",
+      "email": "john.doe@example.com"
+    },
+    {
+      "id": "2",
+      "username": "jane_smith",
+      "password": "Jane",
+      "firstname": "Jane",
+      "lastname": "Smith",
+      "email": "jane.smith@example.com"
+    },
+    {
+      "id": "3",
+      "username": "alex_jones",
+      "password": "Alex",
+      "firstname": "Alex",
+      "lastname": "Jones",
+      "email": "alex.jones@example.com"
+    },
+    {
+      "id": "4",
+      "username": "virat.18",
+      "password": "mannu",
+      "firstname": "Abir",
+      "lastname": "Saha",
+      "email": "abirsaha453@gmail.com"
+    }
+  ],
+  "accounts": [
+    {
+      "id": "101",
+      "user_id": "1",
+      "balance": 500.75
+    },
+    {
+      "id": "102",
+      "user_id": "2",
+      "balance": 1200.5
+    },
+    {
+      "id": "103",
+      "user_id": "3",
+      "balance": 850
+    },
+    {
+      "id": "1004",
+      "user_id": "4",
+      "balance": 7961
+    }
+  ]
+}

@@ -5,9 +5,10 @@ import Input from "./Input";
 import Button from "./Button";
 import CardWarnText from "./CardWarnText";
 import FriendProfile from "./FriendProfile";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setting } from "../../store/tokenSlice";
+import axios from "axios";
 
 const Card = ({
   header = "",
@@ -33,12 +34,13 @@ const Card = ({
   const [password, setPassword] = useState("");
   const [amount, setAmount] = useState(0);
   const [user, setUser] = useState(false);
+  const navigate=useNavigate();
   // will be using three button handlers as everything will be handled on clicking on the button !
   // now that i have track of every input its my turn to send them to the backend
   // i will be using fetch api to send the data to the backend
   const dispatch = useDispatch();
   // handling the urls
-  const signupRoute = "http://localhost:3000/api/v1/user/signup";
+  const signupRoute = "http://localhost:3000/users";
   const signinRoute = "http://localhost:3000/api/v1/user/signin";
   const transferRoute = "http://localhost:3000/api/v1/account/transfer";
 
@@ -46,41 +48,73 @@ const Card = ({
   // i dont think i need it !
 
   // creating the function for signin
+  // idhar hi alteration karni padegi mujhe 
   const signinHandler = async () => {
-    const signingIn = await fetch(signinRoute, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password,
-      }),
-    });
 
-    const response = await signingIn.json();
+    
 
-    console.log(" the response from the signin is --> ", response);
-    if (response.success) {
-      alert("User signed in successfully");
-      setUser(true);
-      dispatch(setting(response.token));
-    } else {
-      alert("User sign in failed");
+    const user_data=await axios.get("http://localhost:3000/users");
+    const account_data=await axios.get("http://localhost:3000/accounts");
+
+    const finding_username=user_data.data.filter((e)=>e.username==username);
+    if(finding_username){
+      console.log("the finding_username is ",finding_username);
+      console.log("the password is ",password)
+      console.log(typeof(finding_username.password))
+      console.log(typeof(password));
+      if(finding_username[0].password==password){
+        
+       
+        // abhi iska account details nikalo 
+        const user_account=account_data.data.filter((e)=>e.user_id==finding_username[0].id);
+        setUser(true);
+        dispatch(setting({
+          name:finding_username[0].firstname,
+          balance:user_account[0].balance
+        }))
+        alert("chalo sab sorted hai ab");
+        // redirect karna hai shayad 
+        navigate("/dashboard");
+        
+      }else{
+        alert("password galat dala hai ");
+        return;
+      }
+
+    }else{
+      alert("No such user with firstname");
+      return;
     }
+
+
+
+    // const response = await signingIn.json();
+
+    // console.log(" the response from the signin is --> ", response);
+    // if (response.success) {
+    //   alert("User signed in successfully");
+    //   setUser(true);
+    //   dispatch(setting(response.token));
+    // } else {
+    //   alert("User sign in failed");
+    // }
   };
 
   // creating the function for signup
-
+// same alteration idhar bhi mujhe karni padegi
   const signupHandler = async () => {
     console.log("the signup handler is called");
     console.log("the data ->", username, password, firstName, lastName, email);
+    const getting_data=await axios.get("http://localhost:3000/users");
+    const length=(getting_data.data.length)+1;
+
     const signingup = await fetch(signupRoute, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        id:length.toString(),
         username: username,
         password: password,
         firstname: firstName,
@@ -90,15 +124,41 @@ const Card = ({
     });
     const response = await signingup.json();
     console.log("the response ->", response);
+    // idhar account bhi create kar 
+    // balance: 1 + Math.floor(Math.random() * 10000),
+    const account_getting=await axios.get("http://localhost:3000/accounts");
+    const length_account=account_getting.data.length+1;
+    const final_length="100"+length_account;
+    const creating_account=await fetch("http://localhost:3000/accounts",{
+      method:"POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id:final_length,
+        user_id:response.id,
+        balance:1 + Math.floor(Math.random() * 10000)
+      }),
+    });
+    const account_info=await creating_account.json();
+    dispatch(setting({
+      name:response.firstname,
+      balance:account_info.balance
+    }));
+    alert("Hey the user is created and also the amount for the user ");
+    // redirect karna hoga shayad 
+
     // here i place of error i will be playing with react toastify
-    if (response.success) {
-      alert("User created successfully");
-      setUser(true);
-      console.log(response.token);
-      dispatch(setting(response.token));
-    } else {
-      alert("User creation failed");
-    }
+    // if (response.success) {
+    //   alert("User created successfully");
+    //   setUser(true);
+    //   console.log(response.token);
+    //   dispatch(setting(response.token));
+    // } else {
+    //   alert("User creation failed");
+    // }
+    // agar mai user signup kar rha hu toh uska mujhe account bhi banana hoga 
+
   };
 
   // creating the function for send money
@@ -106,6 +166,7 @@ const Card = ({
   const to = useSelector((store) => store.friend.id);
   const token = useSelector((store) => store.token.token);
 
+  // idhar bhi changes karne padenge 
   const transferHandler = async () => {
     // write the logic first
     // you need to pass the body with the name and amount

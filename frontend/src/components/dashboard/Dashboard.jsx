@@ -10,32 +10,38 @@ const Dashboard = () => {
   // const [got, setgot] = useState(false);
   const [details, setdetails] = useState({});
   const token = useSelector((store) => store.token.token);
-  useEffect(() => {
-    const fetching = async () => {
-      const response = await fetch(
-        "http://localhost:3000/api/v1/account/balance",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-        }
-      );
-      const details = await response.json();
-      console.log("the details are --> ", details);
-      setdetails(details);
-    };
-    fetching();
-  }, []);
-  return (
+  console.log("the token is ",token);
+  useEffect(()=>{
+    setdetails(token);
+  },[token])
+  // useEffect(() => {
+  //   const fetching = async () => {
+  //     const response = await fetch(
+  //       "http://localhost:3000/api/v1/account/balance",
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "Authorization": `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //     const details = await response.json();
+  //     console.log("the details are --> ", details);
+  //     setdetails(details);
+  //   };
+  //   fetching();
+  // }, []);
+  if(token=={})return ;
+  else {return (
     <div className="bg-white w-full h-screen">
-      {details.name && <Header name={details.name} />}
-      {details.balance && <Balance balance={details.balance} />}
+      {details?.name && <Header name={details?.name} />}
+      {details?.balance && <Balance balance={details?.balance} />}
       <UserSearch />
-      {!token && <Navigate to="/signin" />}
+      {/* {details!={} && <Navigate to="/signin" />} */}
     </div>
   );
+}
 };
 
 export default Dashboard;
